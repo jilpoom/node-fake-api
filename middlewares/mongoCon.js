@@ -9,9 +9,9 @@ const connect = async () => {
         .then(() => {
             console.log("MONGODB CONNECT")
         })
-        .catch((error) => {
-            console.log(error);
-        })
+.catch((error) => {
+        console.log(error);
+    })
 };
 
 mongoose.connection.on('error', (error) => {
