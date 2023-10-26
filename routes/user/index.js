@@ -7,7 +7,9 @@ router.get('/', UserService.findAllUser);
 
 router.get('/:id', UserService.findUserById);
 
-router.post("/", UserService.insertUser);
+router.post('/login', UserService.login);
+
+router.post("/signup", UserService.insertUser);
 
 router.put('/:id', UserService.updateUser);
 
