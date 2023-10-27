@@ -1,6 +1,8 @@
 const User = require('../../models').User;
 const bcryptUtil = require('../../util/bcrypt_util');
 const jwtUtil = require('../../util/jwt_util');
+const redisClient = require('../../middlewares/redis-con');
+
 const {where} = require("sequelize");
 
 
@@ -43,20 +45,23 @@ const insertUser = async (req, res, next) => {
 const updateUser = (req, res, next) => {
     const id = req.params.id;
     const update_data = req.body;
-    User.update(update_data, {
-        where: {
-            id: id,
-        }
-    })
-        .then((affectedCount) => {
-            if (affectedCount[0] === 0) throw new Error("변경된 사항이 없습니다.");
-            res.json({affectedRowCount: affectedCount, message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
+    const authorization =
+
+        User.update(update_data, {
+            where: {
+                id: id,
+            }
         })
-        .catch(err => res.json({message: err.message, error: err.name}));
+            .then((affectedCount) => {
+                if (affectedCount[0] === 0) throw new Error("변경된 사항이 없습니다.");
+                res.json({affectedRowCount: affectedCount, message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
+            })
+            .catch(err => res.json({message: err.message, error: err.name}));
 }
 
 const deleteUser = (req, res, next) => {
     const id = req.params.id;
+
 
     User.destroy({
         where: {
@@ -81,22 +86,79 @@ const login = async (req, res, next) => {
             }
         })
         if (!user) throw new Error("사용자가 없습니다.");
+        console.log(user);
 
         const hashed_password = user.dataValues.user_password;
         const result = await bcryptUtil.CheckHashedPassword(user_password, hashed_password);
 
         if (!result) throw new Error("비밀번호가 틀렸습니다.");
 
-        //TODO: JWT ACCESS TOKEN, REFRESH TOKEN 생성 로직 구현
+        //TODO: JWT ACCESS TOKEN, REFRESH TOKEN 발급
         const accessToken = await jwtUtil.ProvideToken(user, "access");
         const refreshToken = await jwtUtil.ProvideToken({}, "refresh");
+
+        //Redis에 사용자 아이디와 함께 refresh Token 저장
+        redisClient.set(user.dataValues.user_id, refreshToken);
+
         res.json({access_token: accessToken, refresh_token: refreshToken});
 
     } catch (e) {
-        res.json({message: e.message, name: e.name});
+        res.json({message: e.message});
     }
 }
 
+
+//TODO: 토큰 재발급 구현하기
+const reAuthToken = async (req, res, next) => {
+
+    try {
+        const authorization = req.headers.authorization;
+        const refresh_token = req.headers.refresh;
+
+        if (!authorization || !refresh_token) throw new Error("Refresh, Access Token 모두 입력해야 합니다.")
+
+        let accessToken = "";
+
+        if (authorization.startsWith('Bearer')) accessToken = authorization.substring(7); // Bearer 제외
+        else throw new Error("유효한 Access 토큰이 아닙니다.");
+
+        const user_data = jwtUtil.decodeToken(accessToken);
+
+        if (user_data === null) {
+            res.status(401).json({
+                message: "유효한 토큰이 아닙니다."
+            })
+        }
+
+        const access_decode = await jwtUtil.VerifyToken(authorization.substring(7));
+        const refresh_decode = await jwtUtil.VerifyToken(refresh_token);
+        if (!access_decode || !refresh_decode) new Error("유효한 토큰이 아닙니다.");
+
+        // 모든 토큰이 만료되었을 경우
+        if (access_decode.message === 'jwt expired' && refresh_decode.message === 'jwt expired') {
+            res.status(400).json({message: "모든 토큰이 만료되었습니다. 새로 로그인해 주세요."})
+            return;
+        }
+
+        // 엑세스 토큰만 만료되었을 경우
+        if (access_decode.message === 'jwt expired') {
+            const new_access_token = await jwtUtil.ProvideToken(user_data, "access");
+            res.status(200).json({new_access_token: new_access_token, refresh_token: refresh_token});
+            return;
+        }
+
+        // 모든 토큰이 유효할 경우
+        res.status(200).json({message: "모든 토큰이 만료되지 않았습니다."})
+
+
+    } catch (e) {
+        res.status(400).json({message: e.message});
+    }
+
+
+}
+
+
 module.exports = {
-    findAllUser, findUserById, updateUser, deleteUser, insertUser, login,
+    findAllUser, findUserById, updateUser, deleteUser, insertUser, login, reAuthToken
 }

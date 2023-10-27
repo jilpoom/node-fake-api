@@ -1,18 +1,21 @@
 const express = require('express');
+const tokenInterceptor = require('../../middlewares/token_interceptor');
 const router = express.Router();
 
 const UserService = require('./service');
-
-router.get('/', UserService.findAllUser);
-
-router.get('/:id', UserService.findUserById);
 
 router.post('/login', UserService.login);
 
 router.post("/signup", UserService.insertUser);
 
-router.put('/:id', UserService.updateUser);
+router.post("/reauth", UserService.reAuthToken);
 
-router.delete('/:id', UserService.deleteUser);
+router.get('/', tokenInterceptor, UserService.findAllUser);
+
+router.get('/:id', tokenInterceptor, UserService.findUserById);
+
+router.put('/:id', tokenInterceptor, UserService.updateUser);
+
+router.delete('/:id', tokenInterceptor, UserService.deleteUser);
 
 module.exports = router;

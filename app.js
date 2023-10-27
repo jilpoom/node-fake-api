@@ -48,7 +48,7 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
-const mongoConnect = require('./middlewares/mongoCon')
+const mongoConnect = require('./middlewares/mongo-con')
 
 mongoConnect();
 
