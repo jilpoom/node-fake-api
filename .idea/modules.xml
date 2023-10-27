@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../node-test-api.iml" filepath="$PROJECT_DIR$/../node-test-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/node-fake-api.iml" filepath="$PROJECT_DIR$/.idea/node-fake-api.iml" />
     </modules>
   </component>
 </project>
