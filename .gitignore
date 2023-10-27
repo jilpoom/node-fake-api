@@ -1,8 +1,7 @@
 # intellij
+
 .idea/
 *.iml
-out
-gen
 
 # Logs
 logs
