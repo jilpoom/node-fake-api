@@ -15,7 +15,7 @@ const findAllUser = (req, res, next) => {
             res.json(data)
         })
         .catch(err => {
-            res.json({message: err.message, error: "USER_UNFOUNDED_EXCEPTION"});
+            res.json({message: err.message});
         })
 }
 
@@ -31,7 +31,7 @@ const findUserById = (req, res, next) => {
             if (!user) throw new Error("해당 ID의 사용자가 존재하지 않습니다.");
             res.json(user)
         })
-        .catch(err => res.json({message: err.message, error: "USER_UNFOUNDED_EXCEPTION"}))
+        .catch(err => res.json({message: err.message}))
 }
 
 const insertUser = async (req, res, next) => {
@@ -61,7 +61,6 @@ const updateUser = (req, res, next) => {
 
 const deleteUser = (req, res, next) => {
     const id = req.params.id;
-
 
     User.destroy({
         where: {
@@ -93,7 +92,6 @@ const login = async (req, res, next) => {
 
         if (!result) throw new Error("비밀번호가 틀렸습니다.");
 
-        //TODO: JWT ACCESS TOKEN, REFRESH TOKEN 발급
         const accessToken = await jwtUtil.ProvideToken(user, "access");
         const refreshToken = await jwtUtil.ProvideToken({}, "refresh");
 
@@ -108,7 +106,6 @@ const login = async (req, res, next) => {
 }
 
 
-//TODO: 토큰 재발급 구현하기
 const reAuthToken = async (req, res, next) => {
 
     try {
@@ -117,10 +114,9 @@ const reAuthToken = async (req, res, next) => {
 
         if (!authorization || !refresh_token) throw new Error("Refresh, Access Token 모두 입력해야 합니다.")
 
-        let accessToken = "";
+        if (!authorization.startsWith('Bearer')) throw new Error("유효한 Access 토큰이 아닙니다.");
 
-        if (authorization.startsWith('Bearer')) accessToken = authorization.substring(7); // Bearer 제외
-        else throw new Error("유효한 Access 토큰이 아닙니다.");
+        let accessToken = authorization.substring(7); // Bearer 제외
 
         const user_data = jwtUtil.decodeToken(accessToken);
 
@@ -128,6 +124,7 @@ const reAuthToken = async (req, res, next) => {
             res.status(401).json({
                 message: "유효한 토큰이 아닙니다."
             })
+            return;
         }
 
         const access_decode = await jwtUtil.VerifyToken(authorization.substring(7));
@@ -136,7 +133,7 @@ const reAuthToken = async (req, res, next) => {
 
         // 모든 토큰이 만료되었을 경우
         if (access_decode.message === 'jwt expired' && refresh_decode.message === 'jwt expired') {
-            res.status(400).json({message: "모든 토큰이 만료되었습니다. 새로 로그인해 주세요."})
+            res.status(400).json({message: "모든 토큰이 만료되었습니다. 다시 로그인 하세요."})
             return;
         }
 
@@ -149,7 +146,6 @@ const reAuthToken = async (req, res, next) => {
 
         // 모든 토큰이 유효할 경우
         res.status(200).json({message: "모든 토큰이 만료되지 않았습니다."})
-
 
     } catch (e) {
         res.status(400).json({message: e.message});

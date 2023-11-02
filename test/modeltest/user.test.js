@@ -4,11 +4,6 @@ const bcryptUtil = require('../../util/bcrypt_util');
 dotenv.config();
 
 const salt_rounds = parseInt(process.env.BCRYPT_SALT_ROUNDS);
-
-test(" 1 + 1 == 2 ", () => {
-    expect(1 + 1).toEqual(2);
-})
-
 describe('USER MODEL CRUD TEST', () => {
 
     test("SELECT USER", async () => {

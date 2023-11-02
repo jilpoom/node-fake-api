@@ -21,7 +21,6 @@ const ProvideToken = (user_safe_data, token_category) => {
 
         const expiresIn = setTokenPeriod(token_category);
 
-
         JWT.sign({user_safe_data}, JWT_SECRET_KEY, {
             algorithm: 'HS256',
             expiresIn: expiresIn,
@@ -61,7 +60,7 @@ const VerifyToken = (access_token) => {
     return new Promise((resolve, reject) => {
         JWT.verify(access_token, JWT_SECRET_KEY, (err, decode) => {
             if (err) {
-                if (err.message == 'jwt expired') {
+                if (err.message === 'jwt expired') {
                     resolve({message: err.message})
                 }
                 reject();
@@ -71,21 +70,19 @@ const VerifyToken = (access_token) => {
     })
 }
 
-const VerifyRefreshToken = (refresh_token) => {
-    return new Promise((resol))
-}
 
 const decodeToken = (access_token) => {
     return JWT.decode(access_token);
 }
 
-/*
+/**
  * jwt_util.js 내부에서만 사용됨.
+ * @param token_category "access"(30m), "refresh"(7d)
  */
 const setTokenPeriod = (token_category) => {
     switch (token_category) {
         case "access":
-            return '1'
+            return '30m'
         case "refresh":
             return '7d'
     }
