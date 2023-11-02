@@ -7,6 +7,11 @@ module.exports = class User extends Sequelize.Model {
                     allowNull: false,
                     unique: true
                 },
+                user_password: {
+                    type: Sequelize.STRING(100),
+                    allowNull: false,
+                    unique: false,
+                },
                 user_name: {
                     type: Sequelize.STRING(50),
                     allowNull: true,
@@ -16,6 +21,11 @@ module.exports = class User extends Sequelize.Model {
                     type: Sequelize.INTEGER,
                     allowNull: true,
                     unique: false
+                },
+                user_auth: {
+                    type: Sequelize.TINYINT,
+                    allowNull: false,
+                    unique: false,
                 },
                 user_created_at: {
                     type: Sequelize.DATE,
@@ -35,7 +45,8 @@ module.exports = class User extends Sequelize.Model {
                 collate: 'utf8mb4_general_ci'
             });
     }
+
     static associate(db) {
-        db.User.hasMany(db.Board, { foreignKey: 'user', sourceKey: 'id'})
+        db.User.hasMany(db.Board, {foreignKey: 'user', sourceKey: 'id'})
     }
 };

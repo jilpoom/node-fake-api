@@ -9,9 +9,9 @@ const connect = async () => {
         .then(() => {
             console.log("MONGODB CONNECT")
         })
-.catch((error) => {
-        console.log(error);
-    })
+        .catch((error) => {
+            console.log(error);
+        })
 };
 
 mongoose.connection.on('error', (error) => {
@@ -22,7 +22,6 @@ mongoose.connection.on('disconnected', () => {
     console.error('ReConnected...');
     connect();
 })
-
 
 
 module.exports = connect;
