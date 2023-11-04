@@ -11,10 +11,20 @@ module.exports = class Board extends Sequelize.Model {
                     allowNull: true,
                     unique: false
                 },
-                body: {
-                    type: Sequelize.STRING(200),
+                subtitle: {
+                    type: Sequelize.STRING(50),
                     allowNull: true,
                     unique: false
+                },
+                content: {
+                    type: Sequelize.TEXT,
+                    allowNull: true,
+                    unique: false
+                },
+                thumbnail: {
+                    type: Sequelize.STRING(300),
+                    allowNull: true,
+                    unique: false,
                 },
                 reg_date: {
                     type: Sequelize.DATE,
