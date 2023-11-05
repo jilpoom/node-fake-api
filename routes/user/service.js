@@ -45,18 +45,17 @@ const insertUser = async (req, res, next) => {
 const updateUser = (req, res, next) => {
     const id = req.params.id;
     const update_data = req.body;
-    const authorization =
 
-        User.update(update_data, {
-            where: {
-                id: id,
-            }
+    User.update(update_data, {
+        where: {
+            id: id,
+        }
+    })
+        .then((affectedCount) => {
+            if (affectedCount[0] === 0) throw new Error("변경된 사항이 없습니다.");
+            res.json({affectedRowCount: affectedCount, message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
         })
-            .then((affectedCount) => {
-                if (affectedCount[0] === 0) throw new Error("변경된 사항이 없습니다.");
-                res.json({affectedRowCount: affectedCount, message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
-            })
-            .catch(err => res.json({message: err.message, error: err.name}));
+        .catch(err => res.json({message: err.message, error: err.name}));
 }
 
 const deleteUser = (req, res, next) => {

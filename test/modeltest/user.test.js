@@ -20,16 +20,17 @@ describe('USER MODEL CRUD TEST', () => {
             user_name: 'test_username',
             user_age: 20,
             user_password: hash_password,
-            user_auth: 9,
+            user_auth: 1,
+            user_birth: new Date(),
         }
 
-        Model.User.create(dummy_user);
+        await Model.User.create(dummy_user);
     })
 
-    test("DELETE USER", () => {
+    test("DELETE USER", async () => {
         const dummy_user_id = 1;
 
-        Model.User.destroy({
+        await Model.User.destroy({
             where: {id: dummy_user_id},
         })
     })

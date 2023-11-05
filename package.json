@@ -23,7 +23,8 @@
     "mysql2": "^3.6.2",
     "redis": "^4.6.10",
     "sequelize": "^6.33.0",
-    "sequelize-cli": "^6.6.1"
+    "sequelize-cli": "^6.6.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

@@ -26,12 +26,23 @@ module.exports = class Board extends Sequelize.Model {
                     allowNull: true,
                     unique: false,
                 },
+                views: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    unique: false,
+                    defaultValue: 0,
+                },
                 reg_date: {
                     type: Sequelize.DATE,
-                    allowNull: true,
+                    allowNull: false,
                     unique: false,
                     defaultValue: Sequelize.NOW,
                 },
+                tag: {
+                    type: Sequelize.STRING(50),
+                    allowNull: true,
+                    unique: false,
+                }
             },
             {
                 sequelize,

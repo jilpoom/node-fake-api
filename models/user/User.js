@@ -17,15 +17,16 @@ module.exports = class User extends Sequelize.Model {
                     allowNull: true,
                     unique: false
                 },
-                user_age: {
-                    type: Sequelize.INTEGER,
-                    allowNull: true,
+                user_birth: {
+                    type: Sequelize.DATE,
+                    allowNull: false,
                     unique: false
                 },
                 user_auth: {
-                    type: Sequelize.TINYINT,
+                    type: Sequelize.ENUM('0', '1'),
                     allowNull: false,
                     unique: false,
+                    defaultValue: 1,
                 },
                 user_created_at: {
                     type: Sequelize.DATE,
