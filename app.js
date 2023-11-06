@@ -24,12 +24,11 @@ sequelize.sync({alter: true})
         console.error("MARIADB CONNECT FAIL >>>", err);
     })
 
-const mongoConnect = require('./middlewares/mongo-con')
-mongoConnect();
+
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -54,6 +53,8 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
+const mongoConnect = require('./middlewares/mongo-con')
+mongoConnect();
 
 
 module.exports = app;

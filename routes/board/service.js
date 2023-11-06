@@ -1,4 +1,4 @@
-const Board = require('../../models/board/Board').Board
+const Board = require('../../models').Board
 const bcryptUtil = require('../../util/bcrypt_util');
 const jwtUtil = require('../../util/jwt_util');
 const redisClient = require('../../middlewares/redis-con');
@@ -6,28 +6,36 @@ const redisClient = require('../../middlewares/redis-con');
 const findAllBoard = (req, res, next) => {
     Board.findAll()
         .then(boards => {
-            if(!boards) throw new Error("게시글이 존재하지 않습니다.")
+            if(boards.length === 0) throw new Error("게시글이 존재하지 않습니다.")
             let data = []
             boards.forEach(board => data.push(board.dataValues));
-            res.status(200).json(boards);
+            res.status(200).json(data);
         })
-        .catch(e => res.status(400).json(e));
+        .catch(e => res.status(400).json({message: e.message}));
 }
 
 const insertBoard = (req, res, next) => {
     const insert_board = req.body;
     Board.create(insert_board)
-        .then(board => res.status(200).json(board))
+        .then(board => {
+
+            res.status(200).json(board)
+        })
         .catch(e => res.status(400).json(e));
 }
 
 const findBoardById = (req, res, next) => {
     const id = req.params.id;
     Board.findOne({
-        where: id,
+        where: {
+            id: id
+        },
     })
-        .then(board => res.status(200).json(board))
-        .catch(e => res.status(400).json(e));
+        .then(board => {
+            if (!board) throw new Error("해당 ID의 게시글이 존재하지 않습니다.");
+            res.status(200).json(board)
+        })
+        .catch(e => res.status(400).json({message: e.message}));
 }
 
 const updateBoard = (req, res, next) => {

@@ -15,7 +15,9 @@ const tokenValidator = async (req, res, next) => {
 
         const decode = await jwtUtil.VerifyToken(accessToken);
 
-        if (decode) next();
+        if (decode) {
+            next();
+        }
     } catch (e) {
         res.status(400).json({message: e.message});
     }

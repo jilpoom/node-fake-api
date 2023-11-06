@@ -18,7 +18,7 @@ module.exports = class User extends Sequelize.Model {
                     unique: false
                 },
                 user_birth: {
-                    type: Sequelize.DATE,
+                    type: Sequelize.DATEONLY,
                     allowNull: false,
                     unique: false
                 },
@@ -26,13 +26,13 @@ module.exports = class User extends Sequelize.Model {
                     type: Sequelize.ENUM('0', '1'),
                     allowNull: false,
                     unique: false,
-                    defaultValue: 1,
+                    defaultValue: '0',
                 },
                 user_created_at: {
-                    type: Sequelize.DATE,
+                    type: Sequelize.DATEONLY,
                     allowNull: false,
                     unique: false,
-                    defaultValue: Sequelize.NOW
+                    defaultValue: Sequelize.NOW,
                 }
             },
             {

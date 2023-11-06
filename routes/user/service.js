@@ -9,7 +9,7 @@ const {where} = require("sequelize");
 const findAllUser = (req, res, next) => {
     User.findAll()
         .then(users => {
-            if (!users) throw new Error("사용자가 존재하지 않습니다.");
+            if (users.length === 0) throw new Error("사용자가 존재하지 않습니다.");
             let data = []
             users.forEach(user => data.push(user.dataValues))
             res.json(data)
@@ -35,6 +35,7 @@ const findUserById = (req, res, next) => {
 }
 
 const insertUser = async (req, res, next) => {
+    console.log(req.body);
     const insert_data = req.body;
     insert_data['user_password'] = await bcryptUtil.HashPassword(insert_data['user_password']);
     User.create(insert_data)
