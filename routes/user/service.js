@@ -1,24 +1,29 @@
 const User = require('../../models').User;
 const bcryptUtil = require('../../util/bcrypt_util');
 const jwtUtil = require('../../util/jwt_util');
+const dateUtil = require('../../util/datetime_util');
 const redisClient = require('../../middlewares/redis-con');
 
 const {where} = require("sequelize");
 
 
 const findAllUser = (req, res, next) => {
-    User.findAll()
+
+    User.findAll({
+        where: {
+            user_delete_yn: 'y'
+        }
+    })
         .then(users => {
-            if (users.length === 0) throw new Error("사용자가 존재하지 않습니다.");
+            if (users.length === 0) throw ("사용자가 존재하지 않습니다.");
             let data = []
             users.forEach(user => data.push(user.dataValues))
-            res.json(data)
+            res.status(200).json(data);
         })
         .catch(err => {
-            res.json({message: err.message});
+            res.status(400).json({message: err.message});
         })
 }
-
 
 const findUserById = (req, res, next) => {
     const id = req.params.id;
@@ -28,16 +33,17 @@ const findUserById = (req, res, next) => {
         }
     })
         .then(user => {
-            if (!user) throw new Error("해당 ID의 사용자가 존재하지 않습니다.");
-            res.json(user)
+            if (user === null) throw new Error("해당 ID의 사용자가 존재하지 않습니다.");
+            res.status(200).json(user);
         })
-        .catch(err => res.json({message: err.message}))
+        .catch(err => res.status(400).json({message: err.message}))
 }
 
 const insertUser = async (req, res, next) => {
-    console.log(req.body);
     const insert_data = req.body;
+
     insert_data['user_password'] = await bcryptUtil.HashPassword(insert_data['user_password']);
+
     User.create(insert_data)
         .then(user => res.json(user.dataValues))
         .catch(err => res.json({message: err.message, error: err.name}));
@@ -52,27 +58,30 @@ const updateUser = (req, res, next) => {
             id: id,
         }
     })
-        .then((affectedCount) => {
-            if (affectedCount[0] === 0) throw new Error("변경된 사항이 없습니다.");
-            res.json({affectedRowCount: affectedCount, message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
+        .then((affected_object) => {
+            if (affected_object[0] === 0) throw new Error("변경된 사항이 없습니다.");
+            res.json({affected_row: affected_object[1], message: "사용자 정보를 변경했습니다.", user_id: parseInt(id)});
         })
         .catch(err => res.json({message: err.message, error: err.name}));
 }
 
 const deleteUser = (req, res, next) => {
     const id = req.params.id;
+    const user_data = req.body;
 
-    User.destroy({
+    user_data.user_delete_yn = 'n' + "-" + dateUtil.getCurrentDate();
+
+    User.update(user_data, {
         where: {
-            id: id
+            id: id,
         }
     })
-        .then(r => {
-            if (r === 0) throw new Error("해당 id의 사용자가 없습니다.");
-            res.json({message: "사용자를 삭제했습니다.", user_id: id})
+        .then(affected_object => {
+            if (affected_object[0] === 0) throw new Error("해당 id의 사용자가 없습니다.");
+            res.status(200).json({message: "사용자를 삭제했습니다.", user_id: id})
         })
         .catch(err => {
-            res.json({message: err.message, error: err.name});
+            res.status(400).json({message: err.message});
         })
 }
 
@@ -84,24 +93,23 @@ const login = async (req, res, next) => {
                 user_id: user_id,
             }
         })
-        if (!user) throw new Error("사용자가 없습니다.");
-        console.log(user);
+        if (user === null) throw new Error(`해당 id의 사용자가 없습니다. id: ${user_id}`);
 
         const hashed_password = user.dataValues.user_password;
         const result = await bcryptUtil.CheckHashedPassword(user_password, hashed_password);
 
-        if (!result) throw new Error("비밀번호가 틀렸습니다.");
+        if (!result) throw ("비밀번호가 틀렸습니다.");
 
         const accessToken = await jwtUtil.ProvideToken(user, "access");
         const refreshToken = await jwtUtil.ProvideToken({}, "refresh");
 
-        //Redis에 사용자 아이디와 함께 refresh Token 저장
+        //Redis에 사용자 아이디와 함께 refresh token 저장
         redisClient.set(user.dataValues.user_id, refreshToken);
 
-        res.json({access_token: accessToken, refresh_token: refreshToken});
+        res.status(200).json({access_token: accessToken, refresh_token: refreshToken});
 
     } catch (e) {
-        res.json({message: e.message});
+        res.status(400).json({message: e.message});
     }
 }
 
@@ -129,7 +137,7 @@ const reAuthToken = async (req, res, next) => {
 
         const access_decode = await jwtUtil.VerifyToken(authorization.substring(7));
         const refresh_decode = await jwtUtil.VerifyToken(refresh_token);
-        if (!access_decode || !refresh_decode) new Error("유효한 토큰이 아닙니다.");
+        if (access_decode == null || refresh_decode == null) throw new Error("유효한 토큰이 아닙니다.");
 
         // 모든 토큰이 만료되었을 경우
         if (access_decode.message === 'jwt expired' && refresh_decode.message === 'jwt expired') {
@@ -150,7 +158,6 @@ const reAuthToken = async (req, res, next) => {
     } catch (e) {
         res.status(400).json({message: e.message});
     }
-
 
 }
 

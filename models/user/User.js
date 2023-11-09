@@ -33,6 +33,12 @@ module.exports = class User extends Sequelize.Model {
                     allowNull: false,
                     unique: false,
                     defaultValue: Sequelize.NOW,
+                },
+                user_delete_yn: {
+                    type: Sequelize.STRING(50),
+                    allowNull: false,
+                    unique: false,
+                    defaultValue: 'y',
                 }
             },
             {

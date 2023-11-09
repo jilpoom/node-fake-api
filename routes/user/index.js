@@ -14,10 +14,8 @@ router.get('/', TokenInterceptor, UserService.findAllUser);
 
 router.get('/:id', TokenInterceptor, UserService.findUserById);
 
-router.put('/:id', TokenInterceptor, UserService.updateUser);
+router.patch('/:id', TokenInterceptor, UserService.updateUser);
 
 router.delete('/:id', TokenInterceptor, UserService.deleteUser);
-
-// :TODO User 수정 router
 
 module.exports = router;

@@ -19,7 +19,7 @@ const tokenValidator = async (req, res, next) => {
             next();
         }
     } catch (e) {
-        res.status(400).json({message: e.message});
+        res.status(400).json({ message: e.message });
     }
 
 }
