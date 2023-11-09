@@ -38,7 +38,7 @@ module.exports = class User extends Sequelize.Model {
                     type: Sequelize.STRING(50),
                     allowNull: false,
                     unique: false,
-                    defaultValue: 'y',
+                    defaultValue: 'N',
                 }
             },
             {

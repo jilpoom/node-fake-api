@@ -11,7 +11,7 @@ const findAllUser = (req, res, next) => {
 
     User.findAll({
         where: {
-            user_delete_yn: 'y'
+            user_delete_yn: 'N'
         }
     })
         .then(users => {
@@ -69,7 +69,7 @@ const deleteUser = (req, res, next) => {
     const id = req.params.id;
     const user_data = req.body;
 
-    user_data.user_delete_yn = 'n' + "-" + dateUtil.getCurrentDate();
+    user_data.user_delete_yn = 'N' + "-" + dateUtil.getCurrentDate();
 
     User.update(user_data, {
         where: {
