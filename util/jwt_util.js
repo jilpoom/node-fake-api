@@ -45,7 +45,6 @@ const ProvideTokenWithExpiresOption = (user_safe_data, token_category, expiresIn
 
         const expires = expiresIn;
 
-
         JWT.sign({user_safe_data}, JWT_SECRET_KEY, {
             algorithm: 'HS256',
             expiresIn: expires,
@@ -60,10 +59,7 @@ const VerifyToken = (access_token) => {
     return new Promise((resolve, reject) => {
         JWT.verify(access_token, JWT_SECRET_KEY, (err, decode) => {
             if (err) {
-                if (err.message === 'jwt expired') {
-                    resolve({message: err.message})
-                }
-                reject();
+                reject(err);
             }
             resolve(decode);
         })
