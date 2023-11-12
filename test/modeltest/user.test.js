@@ -16,12 +16,11 @@ describe('USER MODEL CRUD TEST', () => {
         console.log(hash_password);
 
         const dummy_user = {
-            user_id: 'test_user',
-            user_name: 'test_username',
-            user_age: 20,
-            user_password: hash_password,
-            user_auth: 1,
-            user_birth: new Date(),
+            id: 'test_user',
+            name: 'test_username',
+            password: hash_password,
+            auth: 1,
+            birth: new Date(),
         }
 
         await Model.User.create(dummy_user);
@@ -31,7 +30,7 @@ describe('USER MODEL CRUD TEST', () => {
         const dummy_user_id = 1;
 
         await Model.User.destroy({
-            where: {id: dummy_user_id},
+            where: { id: dummy_user_id },
         })
     })
 

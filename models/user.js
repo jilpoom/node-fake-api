@@ -2,43 +2,56 @@ const Sequelize = require('sequelize');
 module.exports = class User extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
-                user_id: {
+                email: {
                     type: Sequelize.STRING(20),
                     allowNull: false,
-                    unique: true
+                    unique: true,
+                    comment: '사용자 이메일 겸 아이디'
                 },
-                user_password: {
+                password: {
                     type: Sequelize.STRING(100),
                     allowNull: false,
                     unique: false,
+                    comment: '사용자 비밀번호',
                 },
-                user_name: {
+                name: {
                     type: Sequelize.STRING(50),
                     allowNull: true,
-                    unique: false
+                    unique: false,
+                    comment: '사용자 이름'
                 },
-                user_birth: {
+                birth: {
                     type: Sequelize.DATEONLY,
                     allowNull: false,
-                    unique: false
+                    unique: false,
+                    comment: '사용자 생년월일'
                 },
-                user_auth: {
+                auth: {
                     type: Sequelize.ENUM('0', '1'),
                     allowNull: false,
                     unique: false,
                     defaultValue: '0',
+                    comment: '사용자 권한, 사용자: 0, 관리자: 1',
                 },
-                user_created_at: {
+                created_at: {
                     type: Sequelize.DATEONLY,
                     allowNull: false,
                     unique: false,
                     defaultValue: Sequelize.NOW,
+                    comment: '사용자 등록일자',
                 },
-                user_delete_yn: {
-                    type: Sequelize.STRING(50),
+                delete_yn: {
+                    type: Sequelize.ENUM('Y', 'N'),
                     allowNull: false,
                     unique: false,
                     defaultValue: 'N',
+                    comment: '사용자 삭제 여부'
+                },
+                delete_date: {
+                    type: Sequelize.DATEONLY,
+                    allowNull: true,
+                    unique: false,
+                    comment: "사용자 삭제 일자"
                 }
             },
             {
@@ -54,6 +67,7 @@ module.exports = class User extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.User.hasMany(db.Board, {foreignKey: 'user', sourceKey: 'id'})
+        db.User.hasMany(db.Board, {foreignKey: 'user_id', sourceKey: 'id'});
+        db.User.hasMany(db.Comment, {foreignKey: 'user_id', sourceKey: 'id'});
     }
 };

@@ -1,7 +1,7 @@
 const Model = require('../../models');
 const dotenv = require('dotenv');
 const bcryptUtil = require('../../util/bcrypt_util');
-const {deserialize} = require("mongodb");
+const { deserialize } = require("mongodb");
 const UUID = require('uuid');
 dotenv.config();
 
@@ -17,12 +17,11 @@ describe('BOARD MODEL CRUD TEST', () => {
         const hash_password = await bcryptUtil.HashPassword('1111');
 
         const dummy_user = {
-            user_id: 'test_user' + UUID.v4()[2],
-            user_name: 'test_username',
-            user_age: 20,
-            user_password: hash_password,
-            user_auth: 1,
-            user_birth: new Date(),
+            id: 'test_user' + UUID.v4()[2],
+            name: 'test_username',
+            password: hash_password,
+            auth: 1,
+            birth: new Date(),
         }
 
         const user = await Model.User.create(dummy_user);
@@ -55,24 +54,24 @@ describe('BOARD MODEL CRUD TEST', () => {
         })
 
         await Model.Board.destroy({
-            where: {id: board.dataValues.id},
-        })
+            where: { id: board.dataValues.id }
+        });
 
         await Model.User.destroy({
-            where: {id: user.dataValues.id},
-        })
+            where: { id: user.dataValues.id },
+        });
     })
 
     test("INSERT AND DELETE BOARD", async () => {
         const hash_password = await bcryptUtil.HashPassword('1111');
 
         const dummy_user = {
-            user_id: 'test_user' + UUID.v4()[2],
-            user_name: 'test_username',
-            user_age: 20,
-            user_password: hash_password,
-            user_auth: 1,
-            user_birth: new Date(),
+            id: 'test_user' + UUID.v4()[2],
+            name: 'test_username',
+            age: 20,
+            password: hash_password,
+            auth: 1,
+            birth: new Date(),
         }
 
         const user = await Model.User.create(dummy_user);
@@ -88,13 +87,12 @@ describe('BOARD MODEL CRUD TEST', () => {
 
         const board = await Model.Board.create(board_data);
 
-
         await Model.Board.destroy({
-            where: {id: board.dataValues.id},
+            where: { id: board.dataValues.id },
         })
 
         await Model.User.destroy({
-            where: {id: user.dataValues.id},
+            where: { id: user.dataValues.id },
         })
     })
 
