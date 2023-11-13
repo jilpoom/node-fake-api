@@ -12,7 +12,7 @@ router.get('/:id', TokenInterceptor, BoardService.findBoardById);
 
 router.post('/:id', TokenInterceptor, validate(CheckBoard), BoardService.insertBoard);
 
-router.put('/:id', TokenInterceptor, BoardService.updateBoard);
+router.patch('/:id', TokenInterceptor, BoardService.updateBoard);
 
 router.delete('/:id', TokenInterceptor, BoardService.deleteBoard);
 

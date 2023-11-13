@@ -8,6 +8,7 @@ const { sequelize } = require('./models');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/user/');
 var boardsRouter = require('./routes/board/');
+var commentsRouter = require('./routes/comment');
 
 var app = express();
 // view engine setup
@@ -34,7 +35,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/boards', boardsRouter);
-// TODO: comment, boardfile Router 제작.
+app.use('/comments', commentsRouter);
+// TODO: boardfile Router 제작.
 
 
 // catch 404 and forward to error handler
