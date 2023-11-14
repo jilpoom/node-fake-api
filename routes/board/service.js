@@ -36,7 +36,7 @@ const findBoardById = (req, res, next) => {
             },
         })
         .then(board => {
-            if (!board) throw new Error("해당 ID의 게시글이 존재하지 않습니다.");
+            if (board === null) throw new Error("해당 ID의 게시글이 존재하지 않습니다.");
             res.status(200).json(board)
         })
         .catch(e => res.status(400).json({ message: e.message }));
